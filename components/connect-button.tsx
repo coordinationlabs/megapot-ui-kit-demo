@@ -21,6 +21,8 @@ export function ConnectButton() {
                 });
                 connect({ connector: connectors[0] });
                 setIsOpen(true);
+                // refresh the page
+                window.location.reload();
             } catch (error) {
                 console.error('Error connecting to wallet:', error);
             }

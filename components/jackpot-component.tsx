@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { base } from 'wagmi/chains';
+import { ConnectButton } from './connect-button';
 import { Countdown } from './jackpot-components/countdown';
 import { LastJackpot } from './jackpot-components/last-jackpot';
 import { TicketPrice } from './jackpot-components/ticket-price';
@@ -50,11 +51,15 @@ export function JackpotComponent() {
                         <TicketPrice />
                         <WinningOdds />
                         <Countdown />
-                        {isConnected && address && (
+                        {isConnected && address ? (
                             <Jackpot
                                 contract={mainnetContract}
                                 referrerAddress={REFERRER_ADDRESS}
                             />
+                        ) : (
+                            <div className="text-center">
+                                <ConnectButton />
+                            </div>
                         )}
                     </div>
                 </CardContent>
