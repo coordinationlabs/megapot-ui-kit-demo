@@ -1,6 +1,10 @@
 # Megapot Integration Demo
 
-Learn more at [docs.megapot.io](https://docs.megapot.io/developers/start-here.md)
+Want to run your own jackpot?  Or integrate ours into your own app and take a cut of each ticket sold?  We got you covered!
+
+Follow our getting started guide at [docs.megapot.io](https://docs.megapot.io/developers/start-here)
+
+Check out out the live demo: [https://megapot-ui-kit-demo.vercel.app/](https://megapot-ui-kit-demo.vercel.app/)
 
 Contact us on Telegram [@megapot_io](https://t.me/megapot_io)
 
