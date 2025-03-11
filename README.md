@@ -2,13 +2,15 @@
 
 Learn more at [docs.megapot.io](https://docs.megapot.io/developers/start-here.md)
 
+Live Demo: [https://megapot-standalone-demo.vercel.app/](https://megapot-standalone-demo.vercel.app/)
+
 Contact us on Telegram [@megapot_io](https://t.me/megapot_io)
 
 This is a demo of the Megapot standalone integration. It is a simple demo that shows how to integrate the Megapot contract into a Next.js application.
 
 This can be adapted to use for any jackpot contract that uses the MEGAPOT contract.  Just update the contract address in /lib/constants.ts
 
-This does not use the UI Kit, we are working on a demo for that soon.
+This does not use the UI Kit, you can view that demo at [https://megapot-ui-kit-demo.vercel.app/](https://megapot-ui-kit-demo.vercel.app/) and view the github repo at [https://github.com/coordinationlabs/megapot-ui-kit-demo](https://github.com/coordinationlabs/megapot-ui-kit-demo)
 
 ## Getting Started
 
