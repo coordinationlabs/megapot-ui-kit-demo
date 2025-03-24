@@ -15,6 +15,7 @@ export function Navigation({
     const tabs = [
         { id: 'jackpot', label: 'Jackpot', href: '/jackpot' },
         { id: 'liquidity', label: 'Liquidity', href: '/liquidity' },
+        { id: 'history', label: 'History', href: '/history' },
     ];
 
     return (

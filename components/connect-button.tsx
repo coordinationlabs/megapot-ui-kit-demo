@@ -19,7 +19,17 @@ export function ConnectButton() {
                 await window.ethereum.request({
                     method: 'eth_requestAccounts',
                 });
-                connect({ connector: connectors[0] });
+                connect(
+                    { connector: connectors[0] },
+                    {
+                        onSuccess(data) {
+                            console.log(
+                                'Connected to wallet:',
+                                data.accounts[0]
+                            );
+                        },
+                    }
+                );
                 setIsOpen(true);
                 // refresh the page
                 window.location.reload();
