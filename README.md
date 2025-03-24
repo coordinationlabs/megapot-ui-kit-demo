@@ -41,10 +41,16 @@ pnpm run dev
     /page.tsx - Main page/entry point of the app
     /providers.tsx - Providers for the app (Privy, wagmi, viem, etc.)
     /viem-client.ts - Viem public client for querying the contract
+    /api - API routes
+        /past-jackpots/route.ts - API route for past jackpot results
+        /user-purchase-history/route.ts - API route for user purchase history
     /jackpot - Jackpot page
     /liquidity - Liquidity page
     /components - Shared components
         /ui - UI components (cards, etc.)
+        /history-component.tsx - History component
+        /history-components - History components
+            /user-purchase-history.tsx - User purchase history
         /jackpot-component.tsx - Main jackpot page component
         /jackpot-components
             /buy-tickets.tsx - Buy tickets from (quantity, submit button)
