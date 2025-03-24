@@ -1,7 +1,7 @@
 'use client';
 
 import { getLpPoolStatus, getLpsInfo } from '@/lib/contract';
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { LpDepositForm } from './lp-components/lp-deposit-form';
 import { LpPoolStatus } from './lp-components/lp-pool-status';
@@ -76,12 +76,15 @@ export function LiquidityComponent() {
             ) : (
                 <>
                     <LpPoolStatus poolStatus={state.lpPoolStatus ?? false} />
-                    {state.lpPoolStatus && address && (
+                    {isConnected && address && state.lpPoolStatus && (
                         <LpDepositForm address={address} />
                     )}
-                    {state.lpsInfo && state.lpsInfo[0] > BigInt(0) && (
-                        <UserLpBalances lpInfo={state.lpsInfo} />
-                    )}
+                    {isConnected &&
+                        address &&
+                        state.lpsInfo &&
+                        state.lpsInfo[0] > BigInt(0) && (
+                            <UserLpBalances lpInfo={state.lpsInfo} />
+                        )}
                 </>
             )}
         </div>

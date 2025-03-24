@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@coordinationlabs/megapot-ui-kit':
-        specifier: ^0.0.27
-        version: 0.0.27(@tanstack/react-query@5.67.2(react@18.3.1))(polish@0.2.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@5.67.2(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(encoding@0.1.13)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))
+        specifier: ^0.0.36
+        version: 0.0.36(@tanstack/react-query@5.67.2(react@18.3.1))(polish@0.2.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@5.67.2(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(encoding@0.1.13)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))
       '@privy-io/react-auth':
         specifier: ^2.0.0
         version: 2.6.2(@solana/web3.js@1.98.0(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10))(@types/react@18.3.18)(bs58@5.0.0)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -110,8 +110,8 @@ packages:
   '@coinbase/wallet-sdk@4.3.0':
     resolution: {integrity: sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw==}
 
-  '@coordinationlabs/megapot-ui-kit@0.0.27':
-    resolution: {integrity: sha512-rBN/34DzmgeGYlZhR1nRB6qk+o9+lQ4weTVCNej6nmXMC38wg08VCaFSLmLm9eb9yKUTADslDm8xzCz6QBKmcA==}
+  '@coordinationlabs/megapot-ui-kit@0.0.36':
+    resolution: {integrity: sha512-+vOJGe4nbIE4qVggA2VGFgXP6bORZu9V6IXo/0vbEfbup1VD+8eUNITnkBF70GwLGCjgqNtoUnu+8ntGtzIpew==}
     peerDependencies:
       '@tanstack/react-query': ^5.62.16
       polish: ^0.2.3
@@ -3722,7 +3722,7 @@ snapshots:
       eventemitter3: 5.0.1
       preact: 10.26.4
 
-  '@coordinationlabs/megapot-ui-kit@0.0.27(@tanstack/react-query@5.67.2(react@18.3.1))(polish@0.2.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@5.67.2(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(encoding@0.1.13)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))':
+  '@coordinationlabs/megapot-ui-kit@0.0.36(@tanstack/react-query@5.67.2(react@18.3.1))(polish@0.2.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.14.12(@tanstack/query-core@5.67.2)(@tanstack/react-query@5.67.2(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(encoding@0.1.13)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.23.8(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))':
     dependencies:
       '@tanstack/react-query': 5.67.2(react@18.3.1)
       polish: 0.2.3

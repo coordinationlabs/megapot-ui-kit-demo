@@ -65,8 +65,6 @@ export function JackpotComponent() {
                 </CardContent>
             </Card>
 
-            {/* NOTE: Free RPC servers are not reliable for traversing old logs.  
-                You will need to have a reliable RPC endpoint setup in /app/viem-client.ts */}
             <LastJackpot />
         </div>
     );
