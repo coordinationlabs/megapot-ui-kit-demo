@@ -1,9 +1,23 @@
+import { useLpPoolStatus } from '@/lib/queries'; // Use query hook
 import { Card, CardContent } from '../ui/card';
-export function LpPoolStatus({
-    poolStatus,
-}: {
-    poolStatus: boolean | undefined;
-}) {
+import { Loading } from '../ui/loading'; // Import Loading
+
+export function LpPoolStatus() { // Remove props
+    const { data: poolStatus, isLoading, error } = useLpPoolStatus();
+
+    let content;
+    if (isLoading) {
+        content = <Loading className="h-10 w-24" containerClassName="p-0" />;
+    } else if (error || poolStatus === undefined) {
+        content = <p className="text-4xl font-bold text-red-500">Error</p>;
+    } else {
+        content = (
+            <p className={`text-4xl font-bold ${poolStatus ? 'text-emerald-500' : 'text-orange-500'}`}>
+                {poolStatus ? 'Open' : 'Closed'}
+            </p>
+        );
+    }
+
     return (
         <Card className="bg-white rounded-xl shadow-sm">
             <CardContent className="p-6">
@@ -11,9 +25,7 @@ export function LpPoolStatus({
                     <h2 className="text-lg font-medium text-gray-500 mb-2">
                         LP Pool Status
                     </h2>
-                    <p className="text-4xl font-bold text-emerald-500">
-                        {poolStatus ? 'Open' : 'Closed'}
-                    </p>
+                    {content}
                 </div>
             </CardContent>
         </Card>

@@ -1,92 +1,71 @@
 'use client';
 
-import { getLpPoolStatus, getLpsInfo } from '@/lib/contract';
-import { useCallback, useEffect, useState } from 'react';
+// Removed contract imports, useCallback, useEffect, useState
 import { useAccount } from 'wagmi';
 import { LpDepositForm } from './lp-components/lp-deposit-form';
 import { LpPoolStatus } from './lp-components/lp-pool-status';
 import { UserLpBalances } from './lp-components/user-lp-balances';
-
-interface LpState {
-    lpsInfo?: [bigint, bigint, bigint, boolean];
-    lpPoolStatus?: boolean;
-    isLoading: boolean;
-    error?: string;
-}
+// Import hooks needed for conditional rendering logic
+import { useLpPoolStatus, useLpsInfo } from '@/lib/queries';
+import { Loading } from './ui/loading'; // Import Loading
 
 export function LiquidityComponent() {
     const { address, isConnected } = useAccount();
-    const [state, setState] = useState<LpState>({
-        isLoading: true,
-    });
 
-    const fetchLpPoolStatus = useCallback(async () => {
-        try {
-            const status = await getLpPoolStatus();
-            setState((prev) => ({ ...prev, lpPoolStatus: status }));
-        } catch (error) {
-            setState((prev) => ({
-                ...prev,
-                error: 'Failed to fetch pool status',
-            }));
-        } finally {
-            setState((prev) => ({ ...prev, isLoading: false }));
-        }
-    }, []);
+    // Fetch data needed for conditional logic in *this* component
+    const { data: lpPoolStatus, isLoading: isLoadingStatus, error: errorStatus } = useLpPoolStatus();
+    const { data: lpsInfo, isLoading: isLoadingInfo, error: errorInfo } = useLpsInfo(address);
 
-    const fetchLpsInfo = useCallback(async () => {
-        if (!address) return;
+    const isLoading = isLoadingStatus || isLoadingInfo;
+    const error = errorStatus || errorInfo;
 
-        setState((prev) => ({ ...prev, isLoading: true }));
-        try {
-            const info = await getLpsInfo(address as `0x${string}`);
-            setState((prev) => ({ ...prev, lpsInfo: info }));
-        } catch (error) {
-            setState((prev) => ({
-                ...prev,
-                error: 'Failed to fetch LP info',
-                lpsInfo: undefined,
-            }));
-        } finally {
-            setState((prev) => ({ ...prev, isLoading: false }));
-        }
-    }, [address]);
+    // Determine if user has an active LP position based on lpsInfo
+    const hasActiveLp = lpsInfo?.[0] !== undefined && lpsInfo[0] > 0n; // Check principal > 0
 
-    useEffect(() => {
-        fetchLpPoolStatus();
-        return () => {
-            setState({ isLoading: true });
-        };
-    }, [fetchLpPoolStatus]);
-
-    useEffect(() => {
-        if (isConnected && address) {
-            fetchLpsInfo();
-        }
-    }, [isConnected, address, fetchLpsInfo]);
-
-    if (state.error) {
-        return <div className="text-red-500">{state.error}</div>;
+    if (error) {
+        // Handle error state for the overall component
+        return <div className="text-red-500 text-center p-4">Error loading liquidity data.</div>;
     }
 
     return (
         <div className="space-y-6">
-            {state.isLoading ? (
-                <div className="animate-pulse">Loading...</div>
-            ) : (
-                <>
-                    <LpPoolStatus poolStatus={state.lpPoolStatus ?? false} />
-                    {isConnected && address && state.lpPoolStatus && (
-                        <LpDepositForm address={address} />
-                    )}
-                    {isConnected &&
-                        address &&
-                        state.lpsInfo &&
-                        state.lpsInfo[0] > BigInt(0) && (
-                            <UserLpBalances lpInfo={state.lpsInfo} />
-                        )}
-                </>
+            {/* LpPoolStatus fetches its own data */}
+            <LpPoolStatus />
+
+            {/* Show loading indicator while initial data loads */}
+            {isLoading && <Loading className="h-20 w-full" />}
+
+            {/* Render deposit form if connected, pool is open, and not loading */}
+            {!isLoading && isConnected && address && lpPoolStatus === true && (
+                <LpDepositForm address={address} />
             )}
+
+            {/* Render user balances if connected, user has LP, and not loading */}
+            {/* UserLpBalances fetches its own data using the address */}
+            {!isLoading && isConnected && address && hasActiveLp && (
+                <UserLpBalances walletAddress={address} />
+            )}
+
+             {/* Optional: Message if pool is closed */}
+             {!isLoading && lpPoolStatus === false && (
+                 <p className="text-center text-orange-600 bg-orange-100 p-3 rounded-md">
+                     The LP deposit pool is currently closed.
+                 </p>
+             )}
+
+             {/* Optional: Message if connected but no LP */}
+             {!isLoading && isConnected && !hasActiveLp && lpPoolStatus === true && (
+                 <p className="text-center text-gray-500">
+                     You do not have an active LP position. Use the form above to deposit.
+                 </p>
+             )}
+
+             {/* Message if not connected */}
+             {!isConnected && (
+                 <p className="text-center text-gray-500">
+                     Connect your wallet to manage liquidity.
+                 </p>
+             )}
         </div>
     );
 }
