@@ -1,5 +1,5 @@
-import { useTicketPrice, useTokenName } from '@/lib/queries'; // Use query hooks
-import { Loading } from '../ui/loading'; // Assuming a Loading component exists
+import { useTicketPrice, useTokenName } from '@/lib/queries';
+import { Loading } from '../ui/loading';
 
 export function TicketPrice() {
     const { data: ticketPrice, isLoading: isLoadingPrice, error: errorPrice } = useTicketPrice();

@@ -1,8 +1,6 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-// Removed getUsersInfo import
-// Removed useEffect, useState imports
 import { useAccount } from 'wagmi';
 import { BuyTickets } from './jackpot-components/buy-tickets';
 import { Countdown } from './jackpot-components/countdown';
@@ -11,7 +9,6 @@ import { LastJackpot } from './jackpot-components/last-jackpot';
 import { TicketPrice } from './jackpot-components/ticket-price';
 import { WinningOdds } from './jackpot-components/winning-odds';
 import { WithdrawWinnings } from './jackpot-components/withdraw-winnings';
-// Import useUsersInfo to check if winnings exist before rendering WithdrawWinnings
 import { useUsersInfo } from '@/lib/queries';
 
 export function JackpotComponent() {

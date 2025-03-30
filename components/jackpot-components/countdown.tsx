@@ -1,7 +1,7 @@
-import { useTimeRemaining } from '@/lib/queries'; // Use query hook
+import { useTimeRemaining } from '@/lib/queries';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '../ui/card';
-import { Loading } from '../ui/loading'; // Import Loading component
+import { Loading } from '../ui/loading';
 
 const formatTime = (totalSeconds: number): string => {
     if (totalSeconds <= 0) return '00:00:00';

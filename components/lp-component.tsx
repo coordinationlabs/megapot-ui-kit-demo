@@ -1,13 +1,11 @@
 'use client';
 
-// Removed contract imports, useCallback, useEffect, useState
 import { useAccount } from 'wagmi';
 import { LpDepositForm } from './lp-components/lp-deposit-form';
 import { LpPoolStatus } from './lp-components/lp-pool-status';
 import { UserLpBalances } from './lp-components/user-lp-balances';
-// Import hooks needed for conditional rendering logic
 import { useLpPoolStatus, useLpsInfo } from '@/lib/queries';
-import { Loading } from './ui/loading'; // Import Loading
+import { Loading } from './ui/loading';
 
 export function LiquidityComponent() {
     const { address, isConnected } = useAccount();

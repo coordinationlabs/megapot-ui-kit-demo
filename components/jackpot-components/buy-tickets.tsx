@@ -7,21 +7,21 @@ import {
 import {
     useTokenAllowance,
     useTokenBalance,
-    useTicketPriceInWei, // Use the hook for price in wei
+    useTicketPriceInWei,
     useTokenName,
     useTokenDecimals,
-} from '@/lib/queries'; // Use query hooks
+} from '@/lib/queries';
 import { useState } from 'react';
-import { parseAbi, maxUint256 } from 'viem'; // Corrected: Import maxUint256 for approval
+import { parseAbi, maxUint256 } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
 import { ConnectButton } from '../connect-button';
 import { Button } from '../ui/button';
-import { Loading } from '../ui/loading'; // Import Loading
+import { Loading } from '../ui/loading';
 
 export function BuyTickets({
     walletAddress,
 }: {
-    walletAddress: `0x${string}` | undefined; // Allow undefined if not connected
+    walletAddress: `0x${string}` | undefined;
 }) {
     const { isConnected } = useAccount();
     const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } =
@@ -29,10 +29,9 @@ export function BuyTickets({
 
     const [ticketCount, setTicketCount] = useState<number>(1);
 
-    // Fetch data using hooks
     const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(walletAddress);
     const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(walletAddress);
-    const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPriceInWei(); // Use the correct hook
+    const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPriceInWei();
     const { data: tokenName, isLoading: isLoadingName } = useTokenName();
     const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals();
 
@@ -41,36 +40,33 @@ export function BuyTickets({
     const increment = () => setTicketCount((prev) => prev + 1);
     const decrement = () => setTicketCount((prev) => (prev > 1 ? prev - 1 : 1));
 
-    // Calculate total cost in wei using bigint
     const ticketCostWei = ticketPriceWei !== undefined ? BigInt(ticketCount) * ticketPriceWei : 0n;
 
-    // Check funding and allowance using bigint
     const isWalletFunded = balanceWei !== undefined && balanceWei >= ticketCostWei;
     const hasEnoughAllowance = allowanceWei !== undefined && allowanceWei >= ticketCostWei;
     const displayTokenName = tokenName ?? 'Token'; // Fallback token name
 
     const handleApproveToken = async () => {
         try {
-            if (!walletAddress || ticketCostWei === 0n) { // Check ticketCostWei too
+            if (!walletAddress || ticketCostWei === 0n) {
                 throw new Error('Wallet not connected or ticket price unavailable');
             }
 
-            const approveAbi = parseAbi([ // Use parseAbi directly
+            const approveAbi = parseAbi([
                 'function approve(address spender, uint256 amount) returns (bool)',
             ]);
 
-            // Approve the maximum amount for simplicity, or ticketCostWei if preferred
-            const approveAmount = maxUint256; // Corrected: Use maxUint256
+            const approveAmount = maxUint256;
 
             writeContract?.({
                 abi: approveAbi,
                 address: ERC20_TOKEN_ADDRESS as `0x${string}`,
                 functionName: 'approve',
-                args: [CONTRACT_ADDRESS, approveAmount], // Approve contract to spend
+                args: [CONTRACT_ADDRESS, approveAmount],
             });
         } catch (error) {
             console.error('Error approving token:', error);
-            // Add user feedback here (e.g., toast notification)
+            // TODO: Add user feedback here (e.g., toast notification)
         }
     };
 
@@ -87,17 +83,15 @@ export function BuyTickets({
                 abi: BaseJackpotAbi,
                 address: CONTRACT_ADDRESS as `0x${string}`,
                 functionName: 'purchaseTickets',
-                // Args should match contract: referrer, amount, recipient
-                // Assuming recipient is the buyer (walletAddress)
+                // Args: referrer, amount, recipient (buyer)
                 args: [referrerAddress, ticketCostWei, walletAddress],
             });
         } catch (error) {
             console.error('Error buying ticket:', error);
-            // Add user feedback here
+            // TODO: Add user feedback here
         }
     };
 
-    // Determine button state
     let buttonContent;
     if (!isConnected) {
         buttonContent = <ConnectButton />;
@@ -133,9 +127,7 @@ export function BuyTickets({
         );
     }
 
-    // Display write error if any
      const writeErrorDisplay = isWriteError ? (
-         // Removed shortMessage as it might not exist on the error type
          <p className="text-xs text-red-500 mt-1">Error: {writeError?.message || 'Transaction failed'}</p>
      ) : null;
 
@@ -154,7 +146,7 @@ export function BuyTickets({
                     type="number"
                     value={ticketCount}
                     onChange={(e) =>
-                        setTicketCount(Math.max(1, Number(e.target.value) || 1)) // Ensure value is at least 1
+                        setTicketCount(Math.max(1, Number(e.target.value) || 1))
                     }
                     className="mx-0 w-16 text-center border-t border-b border-emerald-500 py-1 focus:outline-none"
                     min="1"
@@ -173,17 +165,6 @@ export function BuyTickets({
                 {buttonContent}
                 {writeErrorDisplay}
             </div>
-             {/* Optionally display raw data for debugging */}
-             {/* <pre className="text-xs mt-2 text-left overflow-auto">
-                 isLoading: {isLoading.toString()}<br />
-                 PriceWei: {ticketPriceWei?.toString() ?? 'N/A'}<br />
-                 CostWei: {ticketCostWei.toString()}<br />
-                 BalanceWei: {balanceWei?.toString() ?? 'N/A'}<br />
-                 AllowanceWei: {allowanceWei?.toString() ?? 'N/A'}<br />
-                 isFunded: {isWalletFunded.toString()}<br />
-                 hasAllowance: {hasEnoughAllowance.toString()}<br />
-                 isWritePending: {isWritePending.toString()}
-             </pre> */}
         </div>
     );
 }

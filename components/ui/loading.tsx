@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils'; // Assuming cn utility exists for merging classes
+import { cn } from '@/lib/utils';
 
 interface LoadingProps {
-    className?: string; // Allow className prop
-    containerClassName?: string; // Optional class for the container div
+    className?: string;
+    containerClassName?: string;
 }
 
 export function Loading({ className, containerClassName }: LoadingProps) {
@@ -11,7 +11,7 @@ export function Loading({ className, containerClassName }: LoadingProps) {
             <div
                 className={cn(
                     "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500",
-                    className // Apply passed className here
+                    className
                 )}
             ></div>
         </div>

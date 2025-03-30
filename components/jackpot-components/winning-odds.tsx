@@ -1,4 +1,4 @@
-import { useJackpotOdds } from '@/lib/queries'; // Use query hook
+import { useJackpotOdds } from '@/lib/queries';
 
 export function WinningOdds() {
     const { data: jackpotOdds, isLoading, error } = useJackpotOdds();

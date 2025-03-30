@@ -1,6 +1,6 @@
-import { useJackpotAmount, useTokenName } from '@/lib/queries'; // Use query hook
+import { useJackpotAmount, useTokenName } from '@/lib/queries';
 import { Card, CardContent } from '../ui/card';
-import { Loading } from '../ui/loading'; // Import Loading component
+import { Loading } from '../ui/loading';
 
 export function CurrentJackpot() {
     const { data: jackpotAmount, isLoading, error } = useJackpotAmount();

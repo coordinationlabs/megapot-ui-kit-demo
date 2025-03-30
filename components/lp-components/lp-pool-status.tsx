@@ -1,8 +1,8 @@
-import { useLpPoolStatus } from '@/lib/queries'; // Use query hook
+import { useLpPoolStatus } from '@/lib/queries';
 import { Card, CardContent } from '../ui/card';
-import { Loading } from '../ui/loading'; // Import Loading
+import { Loading } from '../ui/loading';
 
-export function LpPoolStatus() { // Remove props
+export function LpPoolStatus() {
     const { data: poolStatus, isLoading, error } = useLpPoolStatus();
 
     let content;

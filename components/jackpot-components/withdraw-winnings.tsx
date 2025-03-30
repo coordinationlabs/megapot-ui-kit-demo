@@ -1,15 +1,15 @@
 import { BaseJackpotAbi } from '@/lib/abi';
 import { CONTRACT_ADDRESS } from '@/lib/constants';
-import { useUsersInfo, useTokenName, useTokenDecimals } from '@/lib/queries'; // Use query hooks
+import { useUsersInfo, useTokenName, useTokenDecimals } from '@/lib/queries';
 import { useWriteContract } from 'wagmi';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { Loading } from '../ui/loading'; // Import Loading
+import { Loading } from '../ui/loading';
 
 export function WithdrawWinnings({
     walletAddress,
 }: {
-    walletAddress: `0x${string}` | undefined; // Add walletAddress prop
+    walletAddress: `0x${string}` | undefined;
 }) {
     const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } = useWriteContract();
 
@@ -33,7 +33,7 @@ export function WithdrawWinnings({
             address: CONTRACT_ADDRESS as `0x${string}`,
             abi: BaseJackpotAbi,
             functionName: 'withdrawWinnings',
-            args: [], // No arguments needed for withdrawWinnings
+            args: [],
         });
     };
 

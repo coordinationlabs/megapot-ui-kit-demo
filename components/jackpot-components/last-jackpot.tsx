@@ -3,11 +3,11 @@ import {
     useTokenName,
     useTokenDecimals,
     useFeeBps,
-} from '@/lib/queries'; // Use query hooks
+} from '@/lib/queries';
 import Link from 'next/link';
 import { zeroAddress } from 'viem';
 import { Card, CardContent } from '../ui/card';
-import { Loading } from '../ui/loading'; // Import Loading component
+import { Loading } from '../ui/loading';
 
 // Helper function to format address
 const formatAddress = (address: string | undefined): string => {

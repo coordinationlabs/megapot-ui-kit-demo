@@ -1,9 +1,7 @@
-import { useTokenName, useTokenDecimals } from '@/lib/queries'; // Use query hooks
-import { formatUnits } from 'viem'; // Import viem util
+import { useTokenName, useTokenDecimals } from '@/lib/queries';
+import { formatUnits } from 'viem';
 
-// Accept bigint | undefined for minLpDeposit
 export function MinLpDeposit({ minLpDeposit }: { minLpDeposit: bigint | undefined }) {
-    // Still fetch name and decimals for formatting
     const { data: tokenName, isLoading: isLoadingName, error: errorName } = useTokenName();
     const { data: tokenDecimals, isLoading: isLoadingDecimals, error: errorDecimals } = useTokenDecimals();
 
@@ -15,11 +13,9 @@ export function MinLpDeposit({ minLpDeposit }: { minLpDeposit: bigint | undefine
 
     let formattedAmount = '...';
     if (minLpDeposit !== undefined && !isLoading && !error) {
-        // Format the bigint using formatUnits
         formattedAmount = formatUnits(minLpDeposit, displayDecimals);
     }
 
-    // Optionally show loading/error states for token info
     if (isLoading) {
         return (
             <div>
@@ -34,7 +30,6 @@ export function MinLpDeposit({ minLpDeposit }: { minLpDeposit: bigint | undefine
              </div>
          );
     }
-    // Handle case where minLpDeposit itself is undefined (e.g., initial load in parent)
     if (minLpDeposit === undefined) {
          return (
              <div>
@@ -45,7 +40,7 @@ export function MinLpDeposit({ minLpDeposit }: { minLpDeposit: bigint | undefine
 
 
     return (
-        <div className="mt-2"> {/* Added margin top */}
+        <div className="mt-2">
             <p className="text-sm text-emerald-500">
                 Minimum Initial LP Deposit: {formattedAmount} {displayName}
             </p>

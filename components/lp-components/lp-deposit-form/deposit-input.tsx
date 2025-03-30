@@ -6,8 +6,8 @@ interface DepositInputProps {
     tokenDecimals: number;
     tokenName: string;
     depositAmountStr: string; // Controlled input value (string)
-    setDepositAmountStr: (value: string) => void; // Setter for the string value
-    parseError: string | null; // Error message from parent parsing
+    setDepositAmountStr: (value: string) => void;
+    parseError: string | null;
 }
 
 export function DepositInput({

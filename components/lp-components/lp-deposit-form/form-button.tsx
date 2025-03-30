@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'; // Use the Button component
-import { Loading } from '@/components/ui/loading'; // Import Loading
+import { Button } from '@/components/ui/button';
+import { Loading } from '@/components/ui/loading';
 
 interface FormButtonProps {
     action: 'approve' | 'deposit' | 'disabled';
@@ -29,7 +29,7 @@ export function FormButton({
     };
 
     // Determine button styling based on action/state
-    let buttonClass = "mt-4 w-full text-white px-4 py-2 rounded-md"; // Common classes
+    let buttonClass = "mt-4 w-full text-white px-4 py-2 rounded-md";
     if (disabled || action === 'disabled') {
         buttonClass += " bg-gray-400 cursor-not-allowed";
     } else if (action === 'approve') {
@@ -37,7 +37,6 @@ export function FormButton({
     } else if (action === 'deposit') {
         buttonClass += " bg-emerald-500 hover:bg-emerald-600";
     } else {
-        // Default/fallback styling if needed
         buttonClass += " bg-gray-500";
     }
 

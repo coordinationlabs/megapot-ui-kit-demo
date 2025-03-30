@@ -1,16 +1,16 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ChevronDown, LogOut, User, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
+import { ChevronDown, LogOut, User, AlertTriangle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi'; // Added useSwitchChain
-import { base } from 'wagmi/chains'; // Added base chain import
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { base } from 'wagmi/chains';
 
 export function ConnectButton() {
-    const { address, isConnected, chainId } = useAccount(); // Added chainId
+    const { address, isConnected, chainId } = useAccount();
     const { connect, connectors } = useConnect();
     const { disconnect } = useDisconnect();
-    const { switchChain } = useSwitchChain(); // Added switchChain
+    const { switchChain } = useSwitchChain();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
