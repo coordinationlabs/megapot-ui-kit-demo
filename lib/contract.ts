@@ -39,7 +39,7 @@ export async function getJackpotAmount(): Promise<bigint | undefined> { // Chang
             abi: BaseJackpotAbi,
             functionName: 'userPoolTotal',
         })) as bigint;
-     const jackpotAmount =
+        const jackpotAmount =
             lpPoolTotalWei > userPoolTotalWei
                 ? lpPoolTotalWei
                 : userPoolTotalWei;
