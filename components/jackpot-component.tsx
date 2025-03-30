@@ -39,9 +39,7 @@ export function JackpotComponent() {
                     <div className="text-center">
                         <TicketPrice />
                         <WinningOdds />
-                        {isConnected && address && (
-                            <BuyTickets/>
-                        )}
+                        <BuyTickets/>
                     </div>
                 </CardContent>
             </Card>
