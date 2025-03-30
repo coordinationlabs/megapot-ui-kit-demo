@@ -39,13 +39,11 @@ export async function getJackpotAmount(): Promise<bigint | undefined> { // Chang
             abi: BaseJackpotAbi,
             functionName: 'userPoolTotal',
         })) as bigint;
-        // This calculation also assumes 18 decimals. Needs fixing if used directly for display.
-        // For now, let's assume the query hook will handle formatting with correct decimals.
-        const jackpotAmount =
+     const jackpotAmount =
             lpPoolTotalWei > userPoolTotalWei
-                ? lpPoolTotalWei // Return raw bigint
-                : userPoolTotalWei; // Return raw bigint
-        return jackpotAmount; // Return bigint | undefined
+                ? lpPoolTotalWei
+                : userPoolTotalWei;
+        return jackpotAmount;
     } catch (error) {
         console.error("Error getting jackpot amount:", error);
         return undefined
