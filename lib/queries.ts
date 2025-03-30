@@ -59,8 +59,8 @@ export function useTicketPriceInWei() {
     return useQuery({
         queryKey: queryKeys.ticketPriceInWei,
         queryFn: getTicketPrice,
-        staleTime: 1000 * 15, // Reduced from 5 minutes
-        refetchInterval: 1000 * 15, // Reduced from 5 minutes
+        staleTime: 1000 * 15,
+        refetchInterval: 1000 * 15,
     });
 }
 
@@ -87,8 +87,8 @@ export function useJackpotAmount() {
     return useQuery({
         queryKey: queryKeys.jackpotAmount,
         queryFn: getJackpotAmount,
-        staleTime: 1000 * 10, // Reduced from 30 seconds
-        refetchInterval: 1000 * 10, // Reduced from 30 seconds
+        staleTime: 1000 * 10,
+        refetchInterval: 1000 * 10,
     });
 }
 
@@ -96,8 +96,8 @@ export function useTimeRemaining() {
     return useQuery({
         queryKey: queryKeys.timeRemaining,
         queryFn: getTimeRemaining,
-        staleTime: 1000 * 1, // Reduced from 5 seconds
-        refetchInterval: 1000 * 1, // Reduced from 5 seconds
+        staleTime: 1000 * 1,
+        refetchInterval: 1000 * 1,
     });
 }
 
@@ -106,8 +106,8 @@ export function useLpsInfo(address: `0x${string}` | undefined) {
         queryKey: queryKeys.lpsInfo(address!),
         queryFn: () => getLpsInfo(address!),
         enabled: !!address,
-        staleTime: 1000 * 15, // Reduced from 1 minute
-        refetchInterval: 1000 * 15, // Reduced from 1 minute
+        staleTime: 1000 * 15,
+        refetchInterval: 1000 * 15,
     });
 }
 
@@ -115,7 +115,7 @@ export function useFeeBps() {
     return useQuery({
         queryKey: queryKeys.feeBps,
         queryFn: getFeeBps,
-        staleTime: 1000 * 60 * 5, // Reduced from 1 hour
+        staleTime: 1000 * 60 * 5,
     });
 }
 
@@ -123,8 +123,8 @@ export function useJackpotOdds() {
     return useQuery({
         queryKey: queryKeys.jackpotOdds,
         queryFn: getJackpotOdds,
-        staleTime: 1000 * 30, // Reduced from 5 minutes
-        refetchInterval: 1000 * 30, // Reduced from 5 minutes
+        staleTime: 1000 * 30,
+        refetchInterval: 1000 * 30,
     });
 }
 
@@ -133,8 +133,8 @@ export function useUsersInfo(address: `0x${string}` | undefined) {
         queryKey: queryKeys.usersInfo(address!),
         queryFn: () => getUsersInfo(address!),
         enabled: !!address,
-        staleTime: 1000 * 10, // Reduced from 30 seconds
-        refetchInterval: 1000 * 10, // Reduced from 30 seconds
+        staleTime: 1000 * 10,
+        refetchInterval: 1000 * 10,
     });
 }
 
@@ -143,8 +143,8 @@ export function useTicketCountForRound(address: `0x${string}` | undefined) {
         queryKey: queryKeys.ticketCountForRound(address!),
         queryFn: () => getTicketCountForRound(address!),
         enabled: !!address,
-        staleTime: 1000 * 10, // Reduced from 30 seconds
-        refetchInterval: 1000 * 10, // Reduced from 30 seconds
+        staleTime: 1000 * 10,
+        refetchInterval: 1000 * 10,
     });
 }
 
@@ -153,8 +153,8 @@ export function useTokenBalance(address: `0x${string}` | undefined) {
         queryKey: queryKeys.tokenBalance(address!),
         queryFn: () => getTokenBalance(address!),
         enabled: !!address,
-        staleTime: 1000 * 5, // Reduced from 15 seconds
-        refetchInterval: 1000 * 5, // Reduced from 15 seconds
+        staleTime: 1000 * 5,
+        refetchInterval: 1000 * 5,
     });
 }
 
@@ -163,8 +163,8 @@ export function useTokenAllowance(address: `0x${string}` | undefined) {
         queryKey: queryKeys.tokenAllowance(address!),
         queryFn: () => getTokenAllowance(address!),
         enabled: !!address,
-        staleTime: 1000 * 30, // Reduced from 1 minute
-        refetchInterval: 1000 * 30, // Reduced from 1 minute
+        staleTime: 1000 * 30,
+        refetchInterval: 1000 * 30,
     });
 }
 
@@ -172,8 +172,8 @@ export function useLpPoolStatus() {
     return useQuery({
         queryKey: queryKeys.lpPoolStatus,
         queryFn: getLpPoolStatus,
-        staleTime: 1000 * 15, // Reduced from 5 minutes
-        refetchInterval: 1000 * 15, // Reduced from 5 minutes
+        staleTime: 1000 * 15,
+        refetchInterval: 1000 * 15,
     });
 }
 
@@ -181,7 +181,7 @@ export function useMinLpDeposit() {
     return useQuery({
         queryKey: queryKeys.minLpDeposit,
         queryFn: getMinLpDeposit,
-        staleTime: 1000 * 60 * 5, // Reduced from 1 hour
+        staleTime: 1000 * 60 * 5,
     });
 }
 
@@ -189,6 +189,6 @@ export function useLastJackpotResults() {
     return useQuery({
         queryKey: queryKeys.lastJackpotResults,
         queryFn: getLastJackpotResults,
-        staleTime: 1000 * 60 * 1, // Reduced from 10 minutes
+        staleTime: 1000 * 60 * 1,
     });
 }
