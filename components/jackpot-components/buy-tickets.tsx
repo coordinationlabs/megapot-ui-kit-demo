@@ -7,9 +7,9 @@ import {
 import {
     useTokenAllowance,
     useTokenBalance,
-    useTicketPrice,
+    useTicketPriceInWei, // Use the hook for price in wei
     useTokenName,
-    useTokenDecimals, // Import useTokenDecimals
+    useTokenDecimals,
 } from '@/lib/queries'; // Use query hooks
 import { useState } from 'react';
 import { parseAbi, maxUint256 } from 'viem'; // Corrected: Import maxUint256 for approval
@@ -32,9 +32,9 @@ export function BuyTickets({
     // Fetch data using hooks
     const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(walletAddress);
     const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(walletAddress);
-    const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPrice();
+    const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPriceInWei(); // Use the correct hook
     const { data: tokenName, isLoading: isLoadingName } = useTokenName();
-    const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals(); // Fetch decimals
+    const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals();
 
     const isLoading = isLoadingBalance || isLoadingAllowance || isLoadingPrice || isLoadingName || isLoadingDecimals;
 

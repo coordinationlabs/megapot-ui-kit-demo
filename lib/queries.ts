@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { formatUnits } from 'viem'; // Import formatUnits
 import {
     getTokenName as fetchTokenName,
     getTokenDecimals as fetchTokenDecimals,
@@ -22,7 +23,8 @@ import {
 const queryKeys = {
     tokenName: ['tokenName'],
     tokenDecimals: ['tokenDecimals'],
-    ticketPrice: ['ticketPrice'],
+    ticketPriceInWei: ['ticketPriceInWei'], // Renamed key
+    humanReadableTicketPrice: ['humanReadableTicketPrice'], // Key for the new hook
     jackpotAmount: ['jackpotAmount'],
     timeRemaining: ['timeRemaining'],
     lpsInfo: (address: `0x${string}`) => ['lpsInfo', address],
@@ -57,14 +59,41 @@ export function useTokenDecimals() {
     });
 }
 
-export function useTicketPrice() {
+// Renamed hook to fetch the raw price in wei
+export function useTicketPriceInWei() {
     return useQuery({
-        queryKey: queryKeys.ticketPrice,
+        queryKey: queryKeys.ticketPriceInWei,
         queryFn: fetchTicketPrice,
         staleTime: 1000 * 60 * 5, // 5 minutes
         refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
     });
 }
+
+// New hook for human-readable ticket price
+export function useTicketPrice() {
+    const { data: ticketPriceInWei, isLoading: isLoadingPrice, error: errorPrice } = useTicketPriceInWei();
+    const { data: decimals, isLoading: isLoadingDecimals, error: errorDecimals } = useTokenDecimals();
+
+    // Combine loading states
+    const isLoading = isLoadingPrice || isLoadingDecimals;
+    // Combine errors (prioritize price error if both exist)
+    const error = errorPrice || errorDecimals;
+
+    // Calculate human-readable price if data is available
+    const data = (ticketPriceInWei !== undefined && decimals !== undefined)
+        ? parseFloat(formatUnits(ticketPriceInWei, decimals))
+        : undefined;
+
+    return {
+        data,
+        isLoading,
+        error,
+        // You might want to expose the underlying query results too
+        // ticketPriceInWeiQuery: { data: ticketPriceInWei, isLoading: isLoadingPrice, error: errorPrice },
+        // tokenDecimalsQuery: { data: decimals, isLoading: isLoadingDecimals, error: errorDecimals },
+    };
+}
+
 
 export function useJackpotAmount() {
     return useQuery({
