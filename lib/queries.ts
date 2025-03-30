@@ -23,7 +23,8 @@ const queryKeys = {
     tokenDecimals: ['tokenDecimals'],
     ticketPriceInWei: ['ticketPriceInWei'],
     humanReadableTicketPrice: ['humanReadableTicketPrice'],
-    jackpotAmount: ['jackpotAmount'],
+    jackpotAmountInWei: ['jackpotAmountInWei'],
+    jackpotAmount: ['jackpotAmount'], // Keep this for the derived hook
     timeRemaining: ['timeRemaining'],
     lpsInfo: (address: `0x${string}`) => ['lpsInfo', address],
     feeBps: ['feeBps'],
@@ -82,15 +83,35 @@ export function useTicketPrice() {
     };
 }
 
-
-export function useJackpotAmount() {
+// Renamed original hook to fetch the raw value
+export function useJackpotAmountInWei() {
     return useQuery({
-        queryKey: queryKeys.jackpotAmount,
+        queryKey: queryKeys.jackpotAmountInWei,
         queryFn: getJackpotAmount,
         staleTime: 1000 * 10,
         refetchInterval: 1000 * 10,
     });
 }
+
+// New hook to provide the formatted value
+export function useJackpotAmount() {
+    const { data: jackpotAmountInWei, isLoading: isLoadingAmount, error: errorAmount } = useJackpotAmountInWei();
+    const { data: decimals, isLoading: isLoadingDecimals, error: errorDecimals } = useTokenDecimals();
+
+    const isLoading = isLoadingAmount || isLoadingDecimals;
+    const error = errorAmount || errorDecimals;
+
+    const data = (jackpotAmountInWei !== undefined && decimals !== undefined)
+        ? parseFloat(formatUnits(jackpotAmountInWei, decimals))
+        : undefined;
+
+    return {
+        data,
+        isLoading,
+        error,
+    };
+}
+
 
 export function useTimeRemaining() {
     return useQuery({
