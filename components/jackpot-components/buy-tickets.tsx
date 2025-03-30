@@ -96,7 +96,7 @@ export function BuyTickets({
     if (!isConnected) {
         buttonContent = <ConnectButton />;
     } else if (isLoading) {
-        buttonContent = <Loading className="h-6 w-6" containerClassName="p-1" />;
+        buttonContent = <Loading className="h-4 w-4" containerClassName="p-1" />;
     } else if (!isWalletFunded) {
         buttonContent = (
             <Button disabled className="mt-2 w-full bg-orange-500 text-white cursor-not-allowed">

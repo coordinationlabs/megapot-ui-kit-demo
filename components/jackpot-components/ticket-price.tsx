@@ -10,7 +10,7 @@ export function TicketPrice() {
 
     let content;
     if (isLoadingPrice || isLoadingName) {
-        content = <Loading className="h-8 w-24" />; // Adjust size as needed
+        content = <Loading className="h-8 w-8 mx-auto" />; // Adjust size as needed
     } else if (errorPrice || errorName) {
         content = <p className="text-2xl font-bold mb-4 text-red-500">Error</p>;
     } else {

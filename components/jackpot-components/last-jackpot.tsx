@@ -32,7 +32,7 @@ export function LastJackpot() {
     let content;
 
     if (isLoading) {
-        content = <Loading className="h-20 w-40" containerClassName="p-0" />;
+        content = <Loading className="h-8 w-8 mx-auto" containerClassName="p-0" />;
     } else if (error || !lastJackpotData) {
         content = <p className="text-lg text-red-500">Error loading last jackpot data.</p>;
     } else {

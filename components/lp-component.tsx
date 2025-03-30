@@ -31,7 +31,7 @@ export function LiquidityComponent() {
             <LpPoolStatus />
 
             {/* Show loading indicator while initial data loads */}
-            {isLoading && <Loading className="h-20 w-full" />}
+            {isLoading && <Loading className="h-8 w-8 mx-auto" />}
 
             {/* Render deposit form if connected, pool is open, and not loading */}
             {!isLoading && isConnected && address && lpPoolStatus === true && (

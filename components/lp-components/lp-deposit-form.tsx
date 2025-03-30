@@ -142,7 +142,7 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
                     <h2 className="text-lg font-medium text-gray-500 mb-2">
                         LP Deposit Form
                     </h2>
-                    {isLoading && <Loading className="h-6 w-6 mx-auto" containerClassName="p-0" />}
+                    {isLoading && <Loading className="h-4 w-4 mx-auto mt-1" containerClassName="p-0" />}
                 </div>
                 {!isLoading && isConnected && address && (
                     <form onSubmit={(e) => e.preventDefault()}>

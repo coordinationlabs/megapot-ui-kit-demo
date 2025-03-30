@@ -12,7 +12,7 @@ export function CurrentJackpot() {
     let content;
     if (isLoading || isLoadingName) {
         // Use Loading component, adjust styling as needed
-        content = <Loading className="h-10 w-32" containerClassName="p-0" />;
+        content = <Loading className="h-8 w-8 mx-auto" containerClassName="p-0" />;
     } else if (error || errorName) {
         content = <p className="text-4xl font-bold text-red-500">Error</p>;
     } else if (jackpotAmount !== undefined) {

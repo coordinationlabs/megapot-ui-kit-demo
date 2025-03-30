@@ -39,7 +39,7 @@ export function WithdrawWinnings({
 
     let content;
     if (isLoading) {
-        content = <Loading className="h-8 w-24" containerClassName="p-2" />;
+        content = <Loading className="h-8 w-8 mx-auto" containerClassName="p-2" />;
     } else if (error) {
         content = <p className="text-lg text-red-500">Error loading winnings.</p>;
     } else {
