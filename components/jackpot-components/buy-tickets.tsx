@@ -18,19 +18,15 @@ import { ConnectButton } from '../connect-button';
 import { Button } from '../ui/button';
 import { Loading } from '../ui/loading';
 
-export function BuyTickets({
-    walletAddress,
-}: {
-    walletAddress: `0x${string}` | undefined;
-}) {
-    const { isConnected } = useAccount();
+export function BuyTickets() {
+    const { address, isConnected } = useAccount();
     const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } =
         useWriteContract();
 
     const [ticketCount, setTicketCount] = useState<number>(1);
 
-    const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(walletAddress);
-    const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(walletAddress);
+    const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(address);
+    const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(address);
     const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPriceInWei();
     const { data: tokenName, isLoading: isLoadingName } = useTokenName();
     const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals();
@@ -48,7 +44,7 @@ export function BuyTickets({
 
     const handleApproveToken = async () => {
         try {
-            if (!walletAddress || ticketCostWei === 0n) {
+            if (!address || ticketCostWei === 0n) {
                 throw new Error('Wallet not connected or ticket price unavailable');
             }
 
@@ -72,7 +68,7 @@ export function BuyTickets({
 
     const handleBuyTicket = async () => {
         try {
-            if (!walletAddress || ticketCostWei === 0n) {
+            if (!address || ticketCostWei === 0n) {
                 throw new Error('Wallet not connected or ticket cost cannot be calculated');
             }
 
@@ -84,7 +80,7 @@ export function BuyTickets({
                 address: CONTRACT_ADDRESS as `0x${string}`,
                 functionName: 'purchaseTickets',
                 // Args: referrer, amount, recipient (buyer)
-                args: [referrerAddress, ticketCostWei, walletAddress],
+                args: [referrerAddress, ticketCostWei, address],
             });
         } catch (error) {
             console.error('Error buying ticket:', error);

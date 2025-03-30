@@ -27,7 +27,7 @@ export function JackpotComponent() {
         <div className="space-y-6">
             {/* Conditionally render WithdrawWinnings based on fetched userInfo */}
             {isConnected && address && hasWinnings && !isLoadingUserInfo && (
-                <WithdrawWinnings walletAddress={address} />
+                <WithdrawWinnings />
             )}
 
             <CurrentJackpot />
@@ -40,12 +40,11 @@ export function JackpotComponent() {
                         <TicketPrice />
                         <WinningOdds />
                         {isConnected && address && (
-                            <BuyTickets walletAddress={address} />
+                            <BuyTickets/>
                         )}
                     </div>
                 </CardContent>
             </Card>
-
             <LastJackpot />
         </div>
     );

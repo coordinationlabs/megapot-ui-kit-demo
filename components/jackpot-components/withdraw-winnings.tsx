@@ -1,20 +1,17 @@
 import { BaseJackpotAbi } from '@/lib/abi';
 import { CONTRACT_ADDRESS } from '@/lib/constants';
 import { useUsersInfo, useTokenName, useTokenDecimals } from '@/lib/queries';
-import { useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract } from 'wagmi';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Loading } from '../ui/loading';
 
-export function WithdrawWinnings({
-    walletAddress,
-}: {
-    walletAddress: `0x${string}` | undefined;
-}) {
+export function WithdrawWinnings() {
+    const { address } = useAccount();
     const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } = useWriteContract();
 
     // Fetch user info, token name, and decimals
-    const { data: userInfo, isLoading: isLoadingInfo, error: errorInfo } = useUsersInfo(walletAddress);
+    const { data: userInfo, isLoading: isLoadingInfo, error: errorInfo } = useUsersInfo(address);
     const { data: tokenName, isLoading: isLoadingName, error: errorName } = useTokenName();
     const { data: tokenDecimals, isLoading: isLoadingDecimals, error: errorDecimals } = useTokenDecimals();
 
