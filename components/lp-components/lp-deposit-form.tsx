@@ -86,13 +86,13 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
 
         try {
             const lpDepositAbi = parseAbi([
-                'function lpDeposit(uint256 amount, uint256 riskPercentage) returns (bool)',
+                'function lpDeposit(uint256 riskPercentage, uint256 value) returns (bool)',
             ]);
             writeContract?.({
                 abi: lpDepositAbi,
                 address: CONTRACT_ADDRESS as `0x${string}`,
                 functionName: 'lpDeposit',
-                args: [depositAmountWei, BigInt(newRiskPercentage)],
+                args: [BigInt(newRiskPercentage), depositAmountWei],
             });
         } catch (error) {
             console.error('Error depositing LP:', error);
