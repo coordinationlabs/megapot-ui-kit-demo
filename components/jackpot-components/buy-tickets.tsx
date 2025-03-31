@@ -5,14 +5,15 @@ import {
     REFERRER_ADDRESS,
 } from '@/lib/constants';
 import {
+    useTicketPriceInWei,
     useTokenAllowance,
     useTokenBalance,
-    useTicketPriceInWei,
-    useTokenName,
     useTokenDecimals,
+    useTokenName,
+    useTokenSymbol,
 } from '@/lib/queries';
 import { useState } from 'react';
-import { parseAbi, maxUint256 } from 'viem';
+import { maxUint256, parseAbi } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
 import { ConnectButton } from '../connect-button';
 import { Button } from '../ui/button';
@@ -20,32 +21,54 @@ import { Loading } from '../ui/loading';
 
 export function BuyTickets() {
     const { address, isConnected } = useAccount();
-    const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } =
-        useWriteContract();
+    const {
+        data: writeData,
+        error: writeError,
+        isError: isWriteError,
+        isPending: isWritePending,
+        writeContract,
+    } = useWriteContract();
 
     const [ticketCount, setTicketCount] = useState<number>(1);
 
-    const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(address);
-    const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(address);
-    const { data: ticketPriceWei, isLoading: isLoadingPrice } = useTicketPriceInWei();
+    const { data: balanceWei, isLoading: isLoadingBalance } =
+        useTokenBalance(address);
+    const { data: allowanceWei, isLoading: isLoadingAllowance } =
+        useTokenAllowance(address);
+    const { data: ticketPriceWei, isLoading: isLoadingPrice } =
+        useTicketPriceInWei();
     const { data: tokenName, isLoading: isLoadingName } = useTokenName();
-    const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals();
-
-    const isLoading = isLoadingBalance || isLoadingAllowance || isLoadingPrice || isLoadingName || isLoadingDecimals;
+    const { data: tokenDecimals, isLoading: isLoadingDecimals } =
+        useTokenDecimals();
+    const { data: tokenSymbol, isLoading: isLoadingSymbol } = useTokenSymbol();
+    const isLoading =
+        isLoadingBalance ||
+        isLoadingAllowance ||
+        isLoadingPrice ||
+        isLoadingName ||
+        isLoadingDecimals ||
+        isLoadingSymbol;
 
     const increment = () => setTicketCount((prev) => prev + 1);
     const decrement = () => setTicketCount((prev) => (prev > 1 ? prev - 1 : 1));
 
-    const ticketCostWei = ticketPriceWei !== undefined ? BigInt(ticketCount) * ticketPriceWei : 0n;
+    const ticketCostWei =
+        ticketPriceWei !== undefined
+            ? BigInt(ticketCount) * ticketPriceWei
+            : 0n;
 
-    const isWalletFunded = balanceWei !== undefined && balanceWei >= ticketCostWei;
-    const hasEnoughAllowance = allowanceWei !== undefined && allowanceWei >= ticketCostWei;
-    const displayTokenName = tokenName ?? 'Token'; // Fallback token name
+    const isWalletFunded =
+        balanceWei !== undefined && balanceWei >= ticketCostWei;
+    const hasEnoughAllowance =
+        allowanceWei !== undefined && allowanceWei >= ticketCostWei;
+    const displayTokenName = tokenSymbol ?? 'Token'; // Fallback token name
 
     const handleApproveToken = async () => {
         try {
             if (!address || ticketCostWei === 0n) {
-                throw new Error('Wallet not connected or ticket price unavailable');
+                throw new Error(
+                    'Wallet not connected or ticket price unavailable'
+                );
             }
 
             const approveAbi = parseAbi([
@@ -69,7 +92,9 @@ export function BuyTickets() {
     const handleBuyTicket = async () => {
         try {
             if (!address || ticketCostWei === 0n) {
-                throw new Error('Wallet not connected or ticket cost cannot be calculated');
+                throw new Error(
+                    'Wallet not connected or ticket cost cannot be calculated'
+                );
             }
 
             // This is YOUR wallet to collect referral fees
@@ -92,10 +117,15 @@ export function BuyTickets() {
     if (!isConnected) {
         buttonContent = <ConnectButton />;
     } else if (isLoading) {
-        buttonContent = <Loading className="h-4 w-4" containerClassName="p-1" />;
+        buttonContent = (
+            <Loading className="h-4 w-4" containerClassName="p-1" />
+        );
     } else if (!isWalletFunded) {
         buttonContent = (
-            <Button disabled className="mt-2 w-full bg-orange-500 text-white cursor-not-allowed">
+            <Button
+                disabled
+                className="mt-2 w-full bg-orange-500 text-white cursor-not-allowed"
+            >
                 Not enough {displayTokenName}
             </Button>
         );
@@ -106,7 +136,12 @@ export function BuyTickets() {
                 disabled={isWritePending}
                 className="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white"
             >
-                {isWritePending ? <Loading className="h-5 w-5 mr-2" containerClassName="p-0 inline-flex" /> : null}
+                {isWritePending ? (
+                    <Loading
+                        className="h-5 w-5 mr-2"
+                        containerClassName="p-0 inline-flex"
+                    />
+                ) : null}
                 Approve {displayTokenName}
             </Button>
         );
@@ -117,16 +152,22 @@ export function BuyTickets() {
                 disabled={isWritePending}
                 className="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white"
             >
-                 {isWritePending ? <Loading className="h-5 w-5 mr-2" containerClassName="p-0 inline-flex" /> : null}
+                {isWritePending ? (
+                    <Loading
+                        className="h-5 w-5 mr-2"
+                        containerClassName="p-0 inline-flex"
+                    />
+                ) : null}
                 Buy Ticket{ticketCount > 1 ? 's' : ''}
             </Button>
         );
     }
 
-     const writeErrorDisplay = isWriteError ? (
-         <p className="text-xs text-red-500 mt-1">Error: {writeError?.message || 'Transaction failed'}</p>
-     ) : null;
-
+    const writeErrorDisplay = isWriteError ? (
+        <p className="text-xs text-red-500 mt-1">
+            Error: {writeError?.message || 'Transaction failed'}
+        </p>
+    ) : null;
 
     return (
         <div className="flex flex-col items-center">
@@ -147,11 +188,14 @@ export function BuyTickets() {
                     className="mx-0 w-16 text-center border-t border-b border-emerald-500 py-1 focus:outline-none"
                     min="1"
                     disabled={isWritePending || isLoading}
-                    style={{ appearance: 'textfield', MozAppearance: 'textfield' }}
+                    style={{
+                        appearance: 'textfield',
+                        MozAppearance: 'textfield',
+                    }}
                 />
                 <button
                     onClick={increment}
-                     disabled={isWritePending || isLoading}
+                    disabled={isWritePending || isLoading}
                     className="bg-emerald-500 text-white px-3 py-1 rounded-r hover:bg-emerald-600 disabled:bg-gray-400"
                 >
                     +

@@ -1,25 +1,33 @@
-import { useJackpotAmount, useTokenName } from '@/lib/queries';
+import { useJackpotAmount, useTokenSymbol } from '@/lib/queries';
 import { Card, CardContent } from '../ui/card';
 import { Loading } from '../ui/loading';
 
 export function CurrentJackpot() {
     const { data: jackpotAmount, isLoading, error } = useJackpotAmount();
-    // Also fetch token name to display alongside amount
-    const { data: tokenName, isLoading: isLoadingName, error: errorName } = useTokenName();
-
-    const displayName = tokenName ?? 'TOKEN'; // Default name
+    const {
+        data: tokenSymbol,
+        isLoading: isLoadingSymbol,
+        error: errorSymbol,
+    } = useTokenSymbol();
+    const displayName = tokenSymbol ?? 'TOKEN'; // Default name
 
     let content;
-    if (isLoading || isLoadingName) {
+    if (isLoading || isLoadingSymbol) {
         // Use Loading component, adjust styling as needed
-        content = <Loading className="h-8 w-8 mx-auto" containerClassName="p-0" />;
-    } else if (error || errorName) {
+        content = (
+            <Loading className="h-8 w-8 mx-auto" containerClassName="p-0" />
+        );
+    } else if (error || errorSymbol) {
         content = <p className="text-4xl font-bold text-red-500">Error</p>;
     } else if (jackpotAmount !== undefined) {
         // Format the amount with the token name
         content = (
             <p className="text-4xl font-bold text-emerald-500">
-                {jackpotAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {displayName}
+                {jackpotAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}{' '}
+                {displayName}
             </p>
         );
     } else {

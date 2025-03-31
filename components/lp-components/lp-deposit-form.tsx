@@ -7,34 +7,57 @@ import {
     useTokenBalance,
     useTokenDecimals,
     useTokenName,
+    useTokenSymbol,
 } from '@/lib/queries';
 import { useState } from 'react';
-import { parseAbi, maxUint256, formatUnits, parseUnits } from 'viem';
+import { formatUnits, maxUint256, parseAbi, parseUnits } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
+import { Loading } from '../ui/loading';
 import { DepositInput } from './lp-deposit-form/deposit-input';
 import { FormButton } from './lp-deposit-form/form-button';
 import { MinLpDeposit } from './lp-deposit-form/min-lp-deposit';
 import { RiskPercentage } from './lp-deposit-form/risk-percentage';
-import { Loading } from '../ui/loading';
 
-export function LpDepositForm({ address }: { address: `0x${string}` | undefined }) {
+export function LpDepositForm({
+    address,
+}: {
+    address: `0x${string}` | undefined;
+}) {
     const [depositAmountStr, setDepositAmountStr] = useState<string>(''); // Store as string to handle decimals
     const [newRiskPercentage, setNewRiskPercentage] = useState<number>(10);
 
     const { isConnected } = useAccount();
-    const { data: writeData, error: writeError, isError: isWriteError, isPending: isWritePending, writeContract } = useWriteContract();
+    const {
+        data: writeData,
+        error: writeError,
+        isError: isWriteError,
+        isPending: isWritePending,
+        writeContract,
+    } = useWriteContract();
 
-    const { data: tokenDecimals, isLoading: isLoadingDecimals } = useTokenDecimals();
+    const { data: tokenDecimals, isLoading: isLoadingDecimals } =
+        useTokenDecimals();
     const { data: tokenName, isLoading: isLoadingName } = useTokenName();
-    const { data: balanceWei, isLoading: isLoadingBalance } = useTokenBalance(address);
-    const { data: allowanceWei, isLoading: isLoadingAllowance } = useTokenAllowance(address);
+    const { data: tokenSymbol, isLoading: isLoadingSymbol } = useTokenSymbol();
+    const { data: balanceWei, isLoading: isLoadingBalance } =
+        useTokenBalance(address);
+    const { data: allowanceWei, isLoading: isLoadingAllowance } =
+        useTokenAllowance(address);
     const { data: lpsInfo, isLoading: isLoadingLpsInfo } = useLpsInfo(address);
-    const { data: minLpDepositWei, isLoading: isLoadingMinDeposit } = useMinLpDeposit();
+    const { data: minLpDepositWei, isLoading: isLoadingMinDeposit } =
+        useMinLpDeposit();
 
-    const isLoading = isLoadingDecimals || isLoadingBalance || isLoadingAllowance || isLoadingLpsInfo || isLoadingMinDeposit || isLoadingName;
+    const isLoading =
+        isLoadingDecimals ||
+        isLoadingBalance ||
+        isLoadingAllowance ||
+        isLoadingLpsInfo ||
+        isLoadingMinDeposit ||
+        isLoadingName ||
+        isLoadingSymbol;
 
     const displayDecimals = tokenDecimals ?? 18; // Default decimals if loading
-    const displayName = tokenName ?? 'Token'; // Default name if loading
+    const displayName = tokenSymbol ?? 'Token'; // Default name if loading
 
     const lpPrincipalWei = lpsInfo?.[0] ?? 0n;
     const isInitialDeposit = lpPrincipalWei === 0n;
@@ -46,16 +69,20 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
             depositAmountWei = parseUnits(depositAmountStr, displayDecimals);
         } catch (e) {
             // Handle invalid input format
-            parseError = "Invalid amount format";
+            parseError = 'Invalid amount format';
             // depositAmountWei remains 0n
         }
     }
 
-    const isWalletFunded = balanceWei !== undefined && balanceWei >= depositAmountWei;
-    const hasEnoughAllowance = allowanceWei !== undefined && allowanceWei >= depositAmountWei;
+    const isWalletFunded =
+        balanceWei !== undefined && balanceWei >= depositAmountWei;
+    const hasEnoughAllowance =
+        allowanceWei !== undefined && allowanceWei >= depositAmountWei;
 
-    const meetsMinDeposit = minLpDepositWei !== undefined && depositAmountWei >= minLpDepositWei;
-    const showMinDepositError = isInitialDeposit && depositAmountWei > 0n && !meetsMinDeposit;
+    const meetsMinDeposit =
+        minLpDepositWei !== undefined && depositAmountWei >= minLpDepositWei;
+    const showMinDepositError =
+        isInitialDeposit && depositAmountWei > 0n && !meetsMinDeposit;
 
     const handleApprove = async () => {
         if (!address) return;
@@ -75,13 +102,24 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
     };
 
     const handleDeposit = async () => {
-        if (!address || depositAmountWei === 0n || parseError || (isInitialDeposit && !meetsMinDeposit)) {
-            console.error('Deposit conditions not met:', { address, depositAmountWei, parseError, isInitialDeposit, meetsMinDeposit });
+        if (
+            !address ||
+            depositAmountWei === 0n ||
+            parseError ||
+            (isInitialDeposit && !meetsMinDeposit)
+        ) {
+            console.error('Deposit conditions not met:', {
+                address,
+                depositAmountWei,
+                parseError,
+                isInitialDeposit,
+                meetsMinDeposit,
+            });
             return;
         }
         if (newRiskPercentage <= 0 || newRiskPercentage > 100) {
-             console.error('Invalid risk percentage');
-             return;
+            console.error('Invalid risk percentage');
+            return;
         }
 
         try {
@@ -99,8 +137,14 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
         }
     };
 
-    const formattedBalance = balanceWei !== undefined ? formatUnits(balanceWei, displayDecimals) : '0';
-    const formattedAllowance = allowanceWei !== undefined ? formatUnits(allowanceWei, displayDecimals) : '0';
+    const formattedBalance =
+        balanceWei !== undefined
+            ? formatUnits(balanceWei, displayDecimals)
+            : '0';
+    const formattedAllowance =
+        allowanceWei !== undefined
+            ? formatUnits(allowanceWei, displayDecimals)
+            : '0';
 
     let buttonAction: 'approve' | 'deposit' | 'disabled' = 'disabled';
     let buttonText = 'Connect Wallet';
@@ -111,10 +155,14 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
             buttonText = 'Loading...';
             buttonDisabled = true;
             buttonAction = 'disabled';
-        } else if (depositAmountWei === 0n || parseError || showMinDepositError) {
-             buttonText = 'Enter Valid Amount';
-             buttonDisabled = true;
-             buttonAction = 'disabled';
+        } else if (
+            depositAmountWei === 0n ||
+            parseError ||
+            showMinDepositError
+        ) {
+            buttonText = 'Enter Valid Amount';
+            buttonDisabled = true;
+            buttonAction = 'disabled';
         } else if (!isWalletFunded) {
             buttonText = `Insufficient ${displayName}`;
             buttonDisabled = true;
@@ -130,10 +178,11 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
         }
     }
 
-      const writeErrorDisplay = isWriteError ? (
-          <p className="text-xs text-red-500 mt-1 text-center">Error: {writeError?.message || 'Transaction failed'}</p>
-      ) : null;
-
+    const writeErrorDisplay = isWriteError ? (
+        <p className="text-xs text-red-500 mt-1 text-center">
+            Error: {writeError?.message || 'Transaction failed'}
+        </p>
+    ) : null;
 
     return (
         <Card className="bg-white rounded-xl shadow-sm">
@@ -142,7 +191,12 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
                     <h2 className="text-lg font-medium text-gray-500 mb-2">
                         LP Deposit Form
                     </h2>
-                    {isLoading && <Loading className="h-4 w-4 mx-auto mt-1" containerClassName="p-0" />}
+                    {isLoading && (
+                        <Loading
+                            className="h-4 w-4 mx-auto mt-1"
+                            containerClassName="p-0"
+                        />
+                    )}
                 </div>
                 {!isLoading && isConnected && address && (
                     <form onSubmit={(e) => e.preventDefault()}>
@@ -150,30 +204,42 @@ export function LpDepositForm({ address }: { address: `0x${string}` | undefined 
                             walletBalance={balanceWei} // Pass bigint
                             allowance={allowanceWei} // Pass bigint
                             tokenDecimals={displayDecimals}
-                            tokenName={displayName}
+                            tokenSymbol={tokenSymbol ?? 'Token'}
                             depositAmountStr={depositAmountStr}
                             setDepositAmountStr={setDepositAmountStr}
                             parseError={parseError}
                         />
-                        {isInitialDeposit && <MinLpDeposit minLpDeposit={minLpDepositWei ?? 0n} />}
-                        {showMinDepositError && minLpDepositWei !== undefined && (
-                             <p className="text-xs text-red-500 mt-1">
-                                 Minimum deposit is {formatUnits(minLpDepositWei, displayDecimals)} {displayName}
-                             </p>
-                         )}
+                        {isInitialDeposit && (
+                            <MinLpDeposit
+                                minLpDeposit={minLpDepositWei ?? 0n}
+                            />
+                        )}
+                        {showMinDepositError &&
+                            minLpDepositWei !== undefined && (
+                                <p className="text-xs text-red-500 mt-1">
+                                    Minimum deposit is{' '}
+                                    {formatUnits(
+                                        minLpDepositWei,
+                                        displayDecimals
+                                    )}{' '}
+                                    {displayName}
+                                </p>
+                            )}
                         <RiskPercentage
                             newRiskPercentage={newRiskPercentage}
                             setNewRiskPercentage={setNewRiskPercentage}
                         />
                     </form>
                 )}
-                 {!isConnected && (
-                      <div className="text-center text-gray-500 my-4">Please connect your wallet.</div>
-                  )}
-                 <div className="flex justify-center mt-4">
-                     <FormButton
-                         action={buttonAction}
-                         text={buttonText}
+                {!isConnected && (
+                    <div className="text-center text-gray-500 my-4">
+                        Please connect your wallet.
+                    </div>
+                )}
+                <div className="flex justify-center mt-4">
+                    <FormButton
+                        action={buttonAction}
+                        text={buttonText}
                         disabled={buttonDisabled || isWritePending}
                         isLoading={isWritePending}
                         handleDeposit={handleDeposit}

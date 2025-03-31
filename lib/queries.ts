@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { formatUnits } from 'viem';
 import {
     getTokenName,
+    getTokenSymbol,
     getTokenDecimals,
     getTicketPrice,
     getJackpotAmount,
@@ -20,6 +21,7 @@ import {
 
 const queryKeys = {
     tokenName: ['tokenName'],
+    tokenSymbol: ['tokenSymbol'],
     tokenDecimals: ['tokenDecimals'],
     ticketPriceInWei: ['ticketPriceInWei'],
     humanReadableTicketPrice: ['humanReadableTicketPrice'],
@@ -47,6 +49,14 @@ export function useTokenName() {
     });
 }
 
+export function useTokenSymbol() {
+    return useQuery({
+        queryKey: queryKeys.tokenSymbol,
+        queryFn: getTokenSymbol,
+        staleTime: Infinity,
+        gcTime: Infinity,
+    });
+}
 export function useTokenDecimals() {
     return useQuery({
         queryKey: queryKeys.tokenDecimals,

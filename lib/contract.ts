@@ -6,6 +6,7 @@ import { CONTRACT_ADDRESS, ERC20_TOKEN_ADDRESS } from "./constants";
 // Standard ERC20 ABI parts needed
 const erc20Abi = parseAbi([
     'function name() view returns (string)',
+    'function symbol() view returns (string)',
     'function decimals() view returns (uint8)',
     'function balanceOf(address account) view returns (uint256)',
     'function allowance(address owner, address spender) view returns (uint256)',
@@ -115,7 +116,7 @@ export async function getJackpotOdds(): Promise<number | undefined> {
 
         // Added check for tokenDecimals being undefined or 0
         if (jackpotAmountWei === undefined || ticketPriceWei === undefined || feeBps === undefined || tokenDecimals === undefined || tokenDecimals === 0 || ticketPriceWei === 0n) {
-             console.error("Missing data for odds calculation", { jackpotAmountWei, ticketPriceWei, feeBps, tokenDecimals });
+            console.error("Missing data for odds calculation", { jackpotAmountWei, ticketPriceWei, feeBps, tokenDecimals });
             return undefined;
         }
 
@@ -195,6 +196,21 @@ export async function getTokenName(): Promise<string | undefined> {
     }
 }
 
+// Function to get the ERC20 token symbol
+export async function getTokenSymbol(): Promise<string | undefined> {
+    try {
+        const symbol = await client.readContract({
+            address: ERC20_TOKEN_ADDRESS as `0x${string}`,
+            abi: erc20Abi,
+            functionName: "symbol",
+        })
+        return symbol as string;
+    } catch (error) {
+        console.error("Error getting token symbol:", error)
+        return undefined
+    }
+}
+
 // Function to get the ERC20 token decimals
 export async function getTokenDecimals(): Promise<number | undefined> {
     try {
@@ -261,9 +277,9 @@ export async function getLpPoolStatus(): Promise<boolean | undefined> {
         // If lpPoolTotal >= lpPoolCap, the pool is closed (full).
         // Otherwise (including when lpPoolTotal is 0n), it's open.
         if (lpPoolTotal >= lpPoolCap) {
-             return false; // Pool is closed (reached capacity)
+            return false; // Pool is closed (reached capacity)
         } else {
-             return true; // Pool is open
+            return true; // Pool is open
         }
 
     } catch (error) {
