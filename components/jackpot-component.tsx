@@ -41,9 +41,7 @@ export function JackpotComponent() {
     }, [address]);
     return (
         <div className="space-y-6">
-            {winningsAvailable > 0 && (
-                <WithdrawWinnings winningsAvailable={winningsAvailable} />
-            )}
+            {winningsAvailable > 0 && <WithdrawWinnings />}
 
             <Card className="bg-white rounded-xl shadow-sm">
                 <CardContent className="p-6">

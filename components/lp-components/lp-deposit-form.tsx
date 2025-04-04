@@ -1,110 +1,100 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { CONTRACT_ADDRESS, ERC20_TOKEN_ADDRESS } from '@/lib/constants';
 import {
-    getLpsInfo,
-    getMinLpDeposit,
-    getTokenAllowance,
-    getTokenBalance,
-} from '@/lib/contract';
-import { useEffect, useState } from 'react';
-import { parseAbi } from 'viem';
-import { useWriteContract } from 'wagmi';
+    useLpsInfo,
+    useMinLpDeposit,
+    useTokenAllowance,
+    useTokenBalance,
+    useTokenDecimals,
+    useTokenName,
+    useTokenSymbol,
+} from '@/lib/queries';
+import { useState } from 'react';
+import { formatUnits, maxUint256, parseAbi, parseUnits } from 'viem';
+import { useAccount, useWriteContract } from 'wagmi';
+import { Loading } from '../ui/loading';
 import { DepositInput } from './lp-deposit-form/deposit-input';
 import { FormButton } from './lp-deposit-form/form-button';
 import { MinLpDeposit } from './lp-deposit-form/min-lp-deposit';
 import { RiskPercentage } from './lp-deposit-form/risk-percentage';
-export function LpDepositForm({ address }: { address: string }) {
-    const [state, setState] = useState({
-        walletAddress: undefined as `0x${string}` | undefined,
-        walletBalance: 0,
-        allowance: 0,
-        lpPrincipal: 0,
-        currentRiskPercentage: null as number | null,
-        newRiskPercentage: 10,
-        minLpDeposit: undefined as number | undefined,
-        walletFunded: false,
-        allowanceFunded: false,
-        depositAmount: 250,
-        tempDepositAmount: 250,
-    });
 
-    const { writeContract } = useWriteContract();
+export function LpDepositForm({
+    address,
+}: {
+    address: `0x${string}` | undefined;
+}) {
+    const [depositAmountStr, setDepositAmountStr] = useState<string>(''); // Store as string to handle decimals
+    const [newRiskPercentage, setNewRiskPercentage] = useState<number>(10);
 
-    useEffect(() => {
-        setState((prev) => ({
-            ...prev,
-            walletAddress: address as `0x${string}`,
-        }));
+    const { isConnected } = useAccount();
+    const {
+        data: writeData,
+        error: writeError,
+        isError: isWriteError,
+        isPending: isWritePending,
+        writeContract,
+    } = useWriteContract();
 
-        const fetchMinLpDeposit = async () => {
-            const minDeposit = await getMinLpDeposit();
-            if (minDeposit) {
-                setState((prev) => ({
-                    ...prev,
-                    minLpDeposit: Number(minDeposit),
-                }));
-            }
-        };
-        fetchMinLpDeposit();
+    const { data: tokenDecimals, isLoading: isLoadingDecimals } =
+        useTokenDecimals();
+    const { data: tokenName, isLoading: isLoadingName } = useTokenName();
+    const { data: tokenSymbol, isLoading: isLoadingSymbol } = useTokenSymbol();
+    const { data: balanceWei, isLoading: isLoadingBalance } =
+        useTokenBalance(address);
+    const { data: allowanceWei, isLoading: isLoadingAllowance } =
+        useTokenAllowance(address);
+    const { data: lpsInfo, isLoading: isLoadingLpsInfo } = useLpsInfo(address);
+    const { data: minLpDepositWei, isLoading: isLoadingMinDeposit } =
+        useMinLpDeposit();
 
-        const fetchLpInfo = async () => {
-            if (!state.walletAddress) return;
-            const lpsInfo = await getLpsInfo(state.walletAddress);
-            if (lpsInfo) {
-                setState((prev) => ({
-                    ...prev,
-                    currentRiskPercentage: Number(lpsInfo[2]),
-                    lpPrincipal: Number(lpsInfo[0]),
-                }));
-            }
-        };
-        fetchLpInfo();
-    }, [address]);
+    const isLoading =
+        isLoadingDecimals ||
+        isLoadingBalance ||
+        isLoadingAllowance ||
+        isLoadingLpsInfo ||
+        isLoadingMinDeposit ||
+        isLoadingName ||
+        isLoadingSymbol;
 
-    const fetchWalletAndAllowance = async () => {
-        if (!state.walletAddress) return;
+    const displayDecimals = tokenDecimals ?? 18; // Default decimals if loading
+    const displayName = tokenSymbol ?? 'Token'; // Default name if loading
 
+    const lpPrincipalWei = lpsInfo?.[0] ?? 0n;
+    const isInitialDeposit = lpPrincipalWei === 0n;
+
+    let depositAmountWei: bigint = 0n;
+    let parseError: string | null = null;
+    if (depositAmountStr && displayDecimals !== undefined) {
         try {
-            const balance = await getTokenBalance(state.walletAddress);
-            setState((prev) => ({
-                ...prev,
-                walletBalance: balance
-                    ? Number((balance / 10 ** 6).toFixed(0))
-                    : 0,
-            }));
-        } catch (error) {
-            console.error('Error fetching wallet balance:', error);
+            depositAmountWei = parseUnits(depositAmountStr, displayDecimals);
+        } catch (e) {
+            // Handle invalid input format
+            parseError = 'Invalid amount format';
+            // depositAmountWei remains 0n
         }
+    }
 
-        try {
-            const allowance = await getTokenAllowance(address as `0x${string}`);
-            setState((prev) => ({
-                ...prev,
-                allowance: allowance ? allowance / 10 ** 6 : 0,
-            }));
-        } catch (error) {
-            console.error('Error fetching allowance:', error);
-        }
-    };
+    const isWalletFunded =
+        balanceWei !== undefined && balanceWei >= depositAmountWei;
+    const hasEnoughAllowance =
+        allowanceWei !== undefined && allowanceWei >= depositAmountWei;
 
-    useEffect(() => {
-        fetchWalletAndAllowance();
-        const interval = setInterval(fetchWalletAndAllowance, 30000);
-        return () => clearInterval(interval); // Cleanup interval on unmount
-    }, [state.walletAddress]);
+    const meetsMinDeposit =
+        minLpDepositWei !== undefined && depositAmountWei >= minLpDepositWei;
+    const showMinDepositError =
+        isInitialDeposit && depositAmountWei > 0n && !meetsMinDeposit;
 
     const handleApprove = async () => {
-        const depositAmount = state.minLpDeposit;
+        if (!address) return;
         try {
-            const lpDepositAbi = [
+            const approveAbi = parseAbi([
                 'function approve(address spender, uint256 amount) returns (bool)',
-            ];
-
+            ]);
             writeContract?.({
-                abi: parseAbi(lpDepositAbi),
+                abi: approveAbi,
                 address: ERC20_TOKEN_ADDRESS as `0x${string}`,
                 functionName: 'approve',
-                args: [CONTRACT_ADDRESS as `0x${string}`, depositAmount],
+                args: [CONTRACT_ADDRESS as `0x${string}`, maxUint256],
             });
         } catch (error) {
             console.error('Error approving token:', error);
@@ -112,87 +102,151 @@ export function LpDepositForm({ address }: { address: string }) {
     };
 
     const handleDeposit = async () => {
-        const depositAmount = state.minLpDeposit;
-        const riskPercentage = state.currentRiskPercentage;
-        try {
-            if (depositAmount === 0) {
-                console.error('Deposit amount cannot be 0');
-                return;
-            }
-            if (!riskPercentage || riskPercentage <= 0) {
-                console.error('Risk percentage cannot be null');
-                return;
-            }
-            const lpDepositAbi = [
-                'function lpDeposit(uint256 amount, uint256 riskPercentage) returns (bool)',
-            ];
+        if (
+            !address ||
+            depositAmountWei === 0n ||
+            parseError ||
+            (isInitialDeposit && !meetsMinDeposit)
+        ) {
+            console.error('Deposit conditions not met:', {
+                address,
+                depositAmountWei,
+                parseError,
+                isInitialDeposit,
+                meetsMinDeposit,
+            });
+            return;
+        }
+        if (newRiskPercentage <= 0 || newRiskPercentage > 100) {
+            console.error('Invalid risk percentage');
+            return;
+        }
 
+        try {
+            const lpDepositAbi = parseAbi([
+                'function lpDeposit(uint256 riskPercentage, uint256 value) returns (bool)',
+            ]);
             writeContract?.({
-                abi: parseAbi(lpDepositAbi),
+                abi: lpDepositAbi,
                 address: CONTRACT_ADDRESS as `0x${string}`,
                 functionName: 'lpDeposit',
-                args: [depositAmount, riskPercentage],
+                args: [BigInt(newRiskPercentage), depositAmountWei],
             });
         } catch (error) {
-            console.error('Error approving token:', error);
+            console.error('Error depositing LP:', error);
         }
     };
+
+    const formattedBalance =
+        balanceWei !== undefined
+            ? formatUnits(balanceWei, displayDecimals)
+            : '0';
+    const formattedAllowance =
+        allowanceWei !== undefined
+            ? formatUnits(allowanceWei, displayDecimals)
+            : '0';
+
+    let buttonAction: 'approve' | 'deposit' | 'disabled' = 'disabled';
+    let buttonText = 'Connect Wallet';
+    let buttonDisabled = true;
+
+    if (isConnected && address) {
+        if (isLoading) {
+            buttonText = 'Loading...';
+            buttonDisabled = true;
+            buttonAction = 'disabled';
+        } else if (
+            depositAmountWei === 0n ||
+            parseError ||
+            showMinDepositError
+        ) {
+            buttonText = 'Enter Valid Amount';
+            buttonDisabled = true;
+            buttonAction = 'disabled';
+        } else if (!isWalletFunded) {
+            buttonText = `Insufficient ${displayName}`;
+            buttonDisabled = true;
+            buttonAction = 'disabled';
+        } else if (!hasEnoughAllowance) {
+            buttonText = `Approve ${displayName}`;
+            buttonDisabled = isWritePending;
+            buttonAction = 'approve';
+        } else {
+            buttonText = 'Deposit LP';
+            buttonDisabled = isWritePending;
+            buttonAction = 'deposit';
+        }
+    }
+
+    const writeErrorDisplay = isWriteError ? (
+        <p className="text-xs text-red-500 mt-1 text-center">
+            Error: {writeError?.message || 'Transaction failed'}
+        </p>
+    ) : null;
 
     return (
         <Card className="bg-white rounded-xl shadow-sm">
             <CardContent className="p-6">
-                <div className="text-center">
+                <div className="text-center mb-4">
                     <h2 className="text-lg font-medium text-gray-500 mb-2">
                         LP Deposit Form
                     </h2>
-                    <form>
-                        <DepositInput
-                            walletBalance={state.walletBalance}
-                            allowance={state.allowance}
-                            setWalletFunded={(funded: boolean) =>
-                                setState((prev) => ({
-                                    ...prev,
-                                    walletFunded: funded,
-                                }))
-                            }
-                            setAllowanceFunded={(funded: boolean) =>
-                                setState((prev) => ({
-                                    ...prev,
-                                    allowanceFunded: funded,
-                                }))
-                            }
-                            setDepositAmount={(amount: number) =>
-                                setState((prev) => ({
-                                    ...prev,
-                                    depositAmount: amount,
-                                }))
-                            }
+                    {isLoading && (
+                        <Loading
+                            className="h-4 w-4 mx-auto mt-1"
+                            containerClassName="p-0"
                         />
-                        {state.minLpDeposit && state.lpPrincipal === 0 && (
-                            <MinLpDeposit minLpDeposit={state.minLpDeposit} />
+                    )}
+                </div>
+                {!isLoading && isConnected && address && (
+                    <form onSubmit={(e) => e.preventDefault()}>
+                        <DepositInput
+                            walletBalance={balanceWei} // Pass bigint
+                            allowance={allowanceWei} // Pass bigint
+                            tokenDecimals={displayDecimals}
+                            tokenSymbol={tokenSymbol ?? 'Token'}
+                            depositAmountStr={depositAmountStr}
+                            setDepositAmountStr={setDepositAmountStr}
+                            parseError={parseError}
+                        />
+                        {isInitialDeposit && (
+                            <MinLpDeposit
+                                minLpDeposit={minLpDepositWei ?? 0n}
+                            />
                         )}
+                        {showMinDepositError &&
+                            minLpDepositWei !== undefined && (
+                                <p className="text-xs text-red-500 mt-1">
+                                    Minimum deposit is{' '}
+                                    {formatUnits(
+                                        minLpDepositWei,
+                                        displayDecimals
+                                    )}{' '}
+                                    {displayName}
+                                </p>
+                            )}
                         <RiskPercentage
-                            newRiskPercentage={state.newRiskPercentage}
-                            setNewRiskPercentage={(percentage: number) =>
-                                setState((prev) => ({
-                                    ...prev,
-                                    newRiskPercentage: percentage,
-                                }))
-                            }
+                            newRiskPercentage={newRiskPercentage}
+                            setNewRiskPercentage={setNewRiskPercentage}
                         />
                     </form>
-                </div>
-                <div className="flex justify-center">
+                )}
+                {!isConnected && (
+                    <div className="text-center text-gray-500 my-4">
+                        Please connect your wallet.
+                    </div>
+                )}
+                <div className="flex justify-center mt-4">
                     <FormButton
-                        walletFunded={state.walletFunded}
-                        allowanceFunded={state.allowanceFunded}
-                        depositAmount={state.depositAmount}
-                        tempDepositAmount={state.tempDepositAmount}
+                        action={buttonAction}
+                        text={buttonText}
+                        disabled={buttonDisabled || isWritePending}
+                        isLoading={isWritePending}
                         handleDeposit={handleDeposit}
                         handleApprove={handleApprove}
-                        walletBalance={state.walletBalance}
                     />
                 </div>
+                {writeErrorDisplay}
             </CardContent>
         </Card>
     );

@@ -1,38 +1,42 @@
+interface AdjustRiskPercentageProps {
+    newRiskPercent: number;
+    setNewRiskPercent: (value: number) => void;
+}
+
 export function AdjustRiskPercentage({
-    riskPercent,
-    tempRiskPercent,
-    setRiskPercent,
-    setTempRiskPercent,
-}: {
-    riskPercent: number;
-    tempRiskPercent: number;
-    setRiskPercent: (riskPercent: number) => void;
-    setTempRiskPercent: (riskPercent: number) => void;
-}) {
+    newRiskPercent,
+    setNewRiskPercent,
+}: AdjustRiskPercentageProps) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = parseInt(e.target.value, 10);
+        if (isNaN(value)) {
+            value = 0;
+        }
+        value = Math.max(0, Math.min(100, value));
+        setNewRiskPercent(value);
+    };
+
     return (
-        <>
+        <div className="flex items-center gap-2 w-full">
             <label
                 htmlFor="riskPercentInput"
-                className="text-sm font-medium text-gray-700 w-1/2"
+                className="text-sm font-medium text-gray-700 whitespace-nowrap"
             >
-                Adjust Risk %
+                Risk % (0-100)
             </label>
             <input
                 id="riskPercentInput"
                 type="number"
                 min="0"
                 max="100"
-                value={tempRiskPercent}
-                onChange={(e) => setTempRiskPercent(Number(e.target.value))}
-                onBlur={() => {
-                    setRiskPercent(tempRiskPercent);
-                }}
-                className="mt-1 block w-full h-10 rounded-md border-2 border-gray-500 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-offset-0 sm:text-sm ps-2"
+                value={newRiskPercent}
+                onChange={handleChange}
+                className="mt-1 block w-full h-10 rounded-md border-2 border-gray-300 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-500 focus:ring-opacity-50 sm:text-sm ps-2"
                 style={{
-                    appearance: 'none',
+                    appearance: 'textfield',
                     MozAppearance: 'textfield',
                 }}
             />
-        </>
+        </div>
     );
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '../ui/card';
+import { Loading } from '../ui/loading';
 
 type UserPurchaseHistory = {
     userAddress: string;
@@ -101,7 +102,7 @@ export function UserPurchaseHistory({ address }: { address: string }) {
                     ) : userPurchaseHistory.length === 0 && !isLoading ? (
                         <p className="text-lg">No purchase history found</p>
                     ) : (
-                        <p className="text-lg">Loading...</p>
+                        <Loading containerClassName="p-0" />
                     )}
                 </div>
             </CardContent>
