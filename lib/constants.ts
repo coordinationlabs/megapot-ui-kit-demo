@@ -1,5 +1,7 @@
-export const CONTRACT_ADDRESS = '0xbEDd4F2beBE9E3E636161E644759f3cbe3d51B95'; // Megapot Jackpot Contract
-export const ERC20_TOKEN_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // USDC on Base
+import { Address } from 'viem';
+
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS! as Address; // Megapot Jackpot Contract
+export const ERC20_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_ERC20_TOKEN_ADDRESS! as Address; // USDC on Base
 export const CONTRACT_START_BLOCK = 27077440;
 export const PURCHASE_TICKET_TOPIC =
     '0xd72c70202ab87b3549553b1d4ceb2a632c83cb96fa2dfe65c30282862fe11ade';

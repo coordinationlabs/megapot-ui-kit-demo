@@ -1,42 +1,41 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ChevronDown, LogOut, User } from 'lucide-react';
+import { AlertTriangle, ChevronDown, LogOut, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { base } from 'wagmi/chains';
 
 export function ConnectButton() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, chainId } = useAccount();
     const { connect, connectors } = useConnect();
     const { disconnect } = useDisconnect();
+    const { switchChain } = useSwitchChain();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    const isWrongNetwork = isConnected && chainId !== base.id;
+
     const handleConnect = async () => {
-        if (!isConnected) {
+        // If connected but on the wrong network, switch chain
+        if (isWrongNetwork) {
+            switchChain?.({ chainId: base.id });
+        }
+        // If not connected, initiate connection
+        else if (!isConnected) {
             try {
                 // Request account access
                 await window.ethereum.request({
                     method: 'eth_requestAccounts',
                 });
-                connect(
-                    { connector: connectors[0] },
-                    {
-                        onSuccess(data) {
-                            console.log(
-                                'Connected to wallet:',
-                                data.accounts[0]
-                            );
-                        },
-                    }
-                );
-                setIsOpen(true);
-                // refresh the page
-                window.location.reload();
+                connect({ connector: connectors[0] });
+                setIsOpen(true); // Keep dropdown open after connecting
             } catch (error) {
                 console.error('Error connecting to wallet:', error);
             }
-        } else {
+        }
+        // If connected and on the correct network, toggle dropdown
+        else {
             setIsOpen(!isOpen);
         }
     };
@@ -67,10 +66,19 @@ export function ConnectButton() {
         <div className="relative" ref={dropdownRef}>
             <Button
                 onClick={handleConnect}
-                variant="outline"
-                className="bg-emerald-50 text-emerald-500 border-emerald-100 hover:bg-emerald-100 hover:text-emerald-600 font-medium px-4 py-2 rounded-md"
+                variant={isWrongNetwork ? 'destructive' : 'outline'} // Change variant if wrong network
+                className={`font-medium px-4 py-2 rounded-md ${
+                    isWrongNetwork
+                        ? 'bg-red-100 text-red-600 border-red-200 hover:bg-red-200 hover:text-red-700' // Destructive styling
+                        : 'bg-emerald-50 text-emerald-500 border-emerald-100 hover:bg-emerald-100 hover:text-emerald-600' // Default styling
+                }`}
             >
-                {isConnected && address ? (
+                {isWrongNetwork ? (
+                    <div className="flex items-center">
+                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        <span>Switch to Base</span>
+                    </div>
+                ) : isConnected && address ? (
                     <div className="flex items-center">
                         <span>
                             {address.slice(0, 6)}...
@@ -83,7 +91,8 @@ export function ConnectButton() {
                 )}
             </Button>
 
-            {isOpen && isConnected && (
+            {/* Only show dropdown if connected AND on the correct network */}
+            {isOpen && isConnected && !isWrongNetwork && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                     <div className="py-1">
                         <button
