@@ -12,6 +12,19 @@ This is a demo of the Megapot integration using our UI Kit. It is a simple demo 
 
 This can be adapted to use for any jackpot contract that uses a Megapot contract.  Just update the contract address in /lib/constants.ts
 
+## How to earn 10% of each ticket sold
+
+- Update [./lib/constants.ts](./lib/constants.ts) with your own referral address
+
+How this works:
+
+- The purchaseTickets function that is called when a user purchases a ticket has 3 parameters:
+  - `recipient`: The address of the user purchasing the ticket
+  - `value`: The amount of USDC sent to purchase the tickets (1_000_000 Szabo per ticket)
+  - `referrer`: The address of the referrer (you)
+
+- The referrer address will receive 10% of the ticket price as a referral fee
+
 ## Getting Started
 
 ```bash
